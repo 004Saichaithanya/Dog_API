@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dog Gallery</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f6f8fa;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    #dog-gallery {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .dog-img {
+      width: 200px;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      background: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>🐶 Dog Image Gallery</h1>
+  <input type="text" id="breed-input" placeholder="Enter breed (e.g., husky)">
+  <button onclick="fetchBreedImages()">Search Breed</button>
+  <button onclick="fetchRandomImages()">Load Random Dogs</button>
+
+  <div id="dog-gallery"></div>
+
+  <script>
+    // Function to display images in gallery
+    function displayImages(images) {
+      const gallery = document.getElementById('dog-gallery');
+      gallery.innerHTML = ''; // Clear existing images
+
+      images.forEach(url => {
+        const img = document.createElement('img');
+        img.src = url;
+        img.className = 'dog-img';
+        gallery.appendChild(img);
+      });
+    }
+
+    // Fetch 5 random images
+    async function fetchRandomImages() {
+      const res = await fetch('https://dog.ceo/api/breeds/image/random/5');
+      const data = await res.json();
+      displayImages(data.message);
+    }
+
+    // Fetch images by breed
+    async function fetchBreedImages() {
+      const breed = document.getElementById('breed-input').value.toLowerCase();
+      if (!breed) {
+        alert('Please enter a breed name!');
+        return;
+      }
+      try {
+        const res = await fetch(`https://dog.ceo/api/breed/${breed}/images/random/5`);
+        const data = await res.json();
+        if (data.status === 'error') {
+          alert('Breed not found. Try a valid breed.');
+          return;
+        }
+        displayImages(data.message);
+      } catch (err) {
+        alert('Something went wrong while fetching images.');
+        console.error(err);
+      }
+    }
+
+    // Load initial random images
+    fetchRandomImages();
+  </script>
+</body>
+</html>
